@@ -1,37 +1,37 @@
 package product
 
 import (
-  "log"
-  "net/http"
+	"log"
+	"net/http"
 
-  "github.com/fannyhasbi/stall-pos/common"
+	"github.com/fannyhasbi/stall-pos/common"
 )
 
-func GetProducts(w http.ResponseWriter, r *http.Request){
-  var product Product
-  var arrProducts []Product
+func GetProducts(w http.ResponseWriter, r *http.Request) {
+	var product Product
+	var arrProducts []Product
 
-  db := common.Connect()
-  defer db.Close()
+	db := common.Connect()
+	defer db.Close()
 
-  rows, err := db.Query("SELECT * FROM product")
-  if err != nil {
-    log.Println(err)
-  }
+	rows, err := db.Query("SELECT * FROM product")
+	if err != nil {
+		log.Println(err)
+	}
 
-  for rows.Next() {
-    if err := rows.Scan(&product.ID, &product.Name, &product.Description, &product.Price); err != nil {
-      log.Println(err)
-      return
-    }
+	for rows.Next() {
+		if err := rows.Scan(&product.ID, &product.Name, &product.Description, &product.Price); err != nil {
+			log.Println(err)
+			return
+		}
 
-    arrProducts = append(arrProducts, product)
-  }
+		arrProducts = append(arrProducts, product)
+	}
 
-  response := ResponseProduct{
-    Status: http.StatusOK,
-    Data: arrProducts,
-  }
+	response := ResponseProduct{
+		Status: http.StatusOK,
+		Data:   arrProducts,
+	}
 
-  common.SendJSON(w, r, response)
+	common.SendJSON(w, r, response)
 }
