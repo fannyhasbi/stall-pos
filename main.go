@@ -23,6 +23,6 @@ func main(){
 
   http.Handle("/", router)
 
-  fmt.Printf("Connected to port : %v", PORT)
+  fmt.Printf("Server running on localhost%v", PORT)
   log.Fatal(http.ListenAndServe(PORT, router))
 }
