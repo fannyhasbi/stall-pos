@@ -9,6 +9,7 @@ import (
   "github.com/gorilla/mux"
 
   "github.com/fannyhasbi/stall-pos/product"
+  "github.com/fannyhasbi/stall-pos/employee"
 )
 
 const PORT = ":8080"
@@ -25,8 +26,10 @@ func main(){
 
   router.HandleFunc("/api/product", product.GetProducts).Methods("GET")
 
+  router.HandleFunc("/api/employee", employee.HandleEmployee).Methods("POST")
+
   http.Handle("/", router)
 
-  fmt.Printf("Server running on localhost%v", PORT)
+  fmt.Printf("Server running on localhost%v\n", PORT)
   log.Fatal(http.ListenAndServe(PORT, router))
 }

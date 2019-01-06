@@ -2,7 +2,6 @@ package product
 
 import (
   "log"
-  "encoding/json"
   "net/http"
 
   "github.com/fannyhasbi/stall-pos/common"
@@ -32,8 +31,7 @@ func GetProducts(w http.ResponseWriter, r *http.Request){
   response := ResponseProduct{
     Status: http.StatusOK,
     Data: arrProducts,
-  }  
+  }
 
-  w.Header().Set("Content-Type", "application/json")
-  json.NewEncoder(w).Encode(response)
+  common.SendJSON(w, r, response)
 }

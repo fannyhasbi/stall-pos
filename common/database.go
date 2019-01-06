@@ -20,8 +20,6 @@ func Connect() *sql.DB {
     conn = fmt.Sprintf("%s@tcp(localhost:3306)/%s", user, dbname)
   }
 
-  log.Println(conn)
-
   db, err := sql.Open("mysql", conn)
 
 	if err != nil {
