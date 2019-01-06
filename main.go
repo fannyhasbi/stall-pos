@@ -7,6 +7,8 @@ import (
   
   _ "github.com/go-sql-driver/mysql"
   "github.com/gorilla/mux"
+
+  "github.com/fannyhasbi/stall-pos/product"
 )
 
 const PORT = ":8080"
@@ -20,6 +22,8 @@ func main(){
   router := mux.NewRouter()
 
   router.HandleFunc("/", handleIndex).Methods("GET", "POST")
+
+  router.HandleFunc("/api/product", product.GetProducts).Methods("GET")
 
   http.Handle("/", router)
 

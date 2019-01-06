@@ -3,6 +3,7 @@ package common
 import (
   "database/sql"
   "log"
+  "fmt"
 )
 
 const (
