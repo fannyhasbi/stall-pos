@@ -14,7 +14,7 @@ func GetProducts(w http.ResponseWriter, r *http.Request) {
 	db := common.Connect()
 	defer db.Close()
 
-	rows, err := db.Query("SELECT * FROM product")
+	rows, err := db.Query("SELECT id, name, description, price FROM product")
 	if err != nil {
 		log.Println(err)
 	}

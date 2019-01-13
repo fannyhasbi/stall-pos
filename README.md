@@ -17,7 +17,7 @@ Simple Stall POS built with Golang.
 **GET** `/api/product`
 
 ### Employee
-**GET** `/api/employee`
+**POST** `/api/employee`
 
 ### Order
 **POST** `/api/order/`

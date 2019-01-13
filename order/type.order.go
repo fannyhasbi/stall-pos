@@ -8,16 +8,11 @@ type OrderDetails struct {
 }
 
 type orderInsert struct {
-  EmployeeID int
-  CustomerID int
+	EmployeeID int
+	CustomerID int
 }
 
 type orderDetailsInsert struct {
-  OrderID int
-  ProductID int
-}
-
-type commonResponse struct {
-	Status int `json:"status"`
-	Data   interface{} `json:"data"`
+	OrderID   int
+	ProductID int
 }

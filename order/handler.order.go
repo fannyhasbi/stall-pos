@@ -1,85 +1,68 @@
 package order
 
 import (
-  "log"
-  "net/http"
-  "strconv"
-  
-  "github.com/fannyhasbi/stall-pos/common"
+	"log"
+	"net/http"
+	"strconv"
+
+	"github.com/fannyhasbi/stall-pos/common"
 )
 
 func HandleOrder(w http.ResponseWriter, r *http.Request) {
-  if len(r.FormValue("id_product")) == 0 || len(r.FormValue("id_employee")) == 0 {
-    response := commonResponse{
-      Status: http.StatusBadRequest,
-      Data: nil,
-    }
-    
-    common.SendJSON(w, r, response)
-    return
-  }
+	if len(r.FormValue("id_product")) == 0 || len(r.FormValue("id_employee")) == 0 {
+		common.CommonResponse(w, r, http.StatusBadRequest, nil)
+		return
+	}
 
-  id_employee, err := strconv.Atoi(r.FormValue("id_employee"))
-  if err != nil {
-    log.Println(err)
-    return
-  }
+	id_employee, err := strconv.Atoi(r.FormValue("id_employee"))
+	if err != nil {
+		log.Println(err)
+		return
+	}
 
-  var id_customer int
-  if len(r.FormValue("id_customer")) == 0 {
-    id_customer = 0
-  } else {
-    id_customer, err = strconv.Atoi(r.FormValue("id_customer"))
-    if err != nil {
-      log.Println(err)
-      return
-    }
-  }
+	var id_customer int
+	if len(r.FormValue("id_customer")) == 0 {
+		id_customer = 0
+	} else {
+		id_customer, err = strconv.Atoi(r.FormValue("id_customer"))
+		if err != nil {
+			log.Println(err)
+			return
+		}
+	}
 
-  ord := orderInsert{
-    EmployeeID: id_employee,
-    CustomerID: id_customer,
-  }
+	ord := orderInsert{
+		EmployeeID: id_employee,
+		CustomerID: id_customer,
+	}
 
-  orderId, err := insertOrder(ord)
+	orderId, err := insertOrder(ord)
 
-  if err != nil {
-    response := commonResponse{
-      Status: http.StatusInternalServerError,
-      Data: nil,
-    }
-    common.SendJSON(w, r, response)
-    log.Println(err)
-    return
-  }
+	if err != nil {
+		common.CommonResponse(w, r, http.StatusInternalServerError, nil)
 
-  id_product, err := strconv.Atoi(r.FormValue("id_product"))
-  if err != nil {
-    log.Println(err)
-    return
-  }
-  
-  ordDetails := orderDetailsInsert{
-    OrderID: orderId,
-    ProductID: id_product,
-  }
+		log.Println(err)
+		return
+	}
 
-  err = insertOrderDetails(ordDetails)
-  if err != nil {
-    response := commonResponse{
-      Status: http.StatusInternalServerError,
-      Data: nil,
-    }
-    common.SendJSON(w, r, response)
-    log.Println(err)
+	id_product, err := strconv.Atoi(r.FormValue("id_product"))
+	if err != nil {
+		log.Println(err)
+		return
+	}
 
-    return
-  }
+	ordDetails := orderDetailsInsert{
+		OrderID:   orderId,
+		ProductID: id_product,
+	}
 
-  response := commonResponse{
-    Status: http.StatusOK,
-    Data: orderId,
-  }
+	err = insertOrderDetails(ordDetails)
+	if err != nil {
+		common.CommonResponse(w, r, http.StatusInternalServerError, nil)
+		log.Println(err)
 
-  common.SendJSON(w, r, response)
+		return
+	}
+
+	common.CommonResponse(w, r, http.StatusOK, orderId)
 }
