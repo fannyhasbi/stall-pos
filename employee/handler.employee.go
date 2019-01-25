@@ -1,6 +1,7 @@
 package employee
 
 import (
+	"encoding/json"
 	"database/sql"
 	"log"
 	"net/http"
@@ -15,20 +16,22 @@ func HandleEmployee(w http.ResponseWriter, r *http.Request) {
 	password := r.FormValue("password")
 
 	if len(username) == 0 || len(password) == 0 {
-		response := ResponseEmployee{
-			Status: http.StatusBadRequest,
-			Data:   nil,
-		}
-
-		common.SendJSON(w, r, response)
+		common.SendJSONError(w, r, "Bad Request", http.StatusBadRequest)
 		return
 	}
 
-	db := common.Connect()
+	db, err := common.Connect()
+	if err != nil {
+		log.Println(err)
+
+		common.SendJSONError(w, r, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	defer db.Close()
 
 	row := db.QueryRow("SELECT id, name, username FROM employee WHERE username = ? AND password = MD5(?)", username, password)
-	err := row.Scan(&employee.ID, &employee.Name, &employee.Username)
+	err = row.Scan(&employee.ID, &employee.Name, &employee.Username)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -37,7 +40,14 @@ func HandleEmployee(w http.ResponseWriter, r *http.Request) {
 				Data:   nil,
 			}
 
-			common.SendJSON(w, r, response)
+			res, err := json.Marshal(response)
+			if err != nil {
+				log.Println(err)
+				common.SendJSONError(w, r, err.Error(), http.StatusInternalServerError)
+				return
+			}
+
+			common.SendJSON(w, r, res, http.StatusOK)
 			return
 		} else {
 			log.Println(err)
@@ -50,5 +60,11 @@ func HandleEmployee(w http.ResponseWriter, r *http.Request) {
 		Data:   employee,
 	}
 
-	common.SendJSON(w, r, response)
+	res, err := json.Marshal(response)
+	if err != nil {
+		common.SendJSONError(w, r, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	common.SendJSON(w, r, res, http.StatusOK)
 }

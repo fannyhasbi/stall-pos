@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 
-	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 
 	"github.com/fannyhasbi/stall-pos/employee"
@@ -14,6 +13,10 @@ import (
 )
 
 const PORT = ":8080"
+
+func init(){
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+}
 
 func handleIndex(w http.ResponseWriter, r *http.Request) {
 	response := "This is web service for Stall POS"

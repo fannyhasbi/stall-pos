@@ -2,6 +2,7 @@ package order
 
 import (
   "log"
+  "encoding/json"
   "net/http"
   "strconv"
   
@@ -10,12 +11,7 @@ import (
 
 func HandleOrder(w http.ResponseWriter, r *http.Request) {
   if len(r.FormValue("id_product")) == 0 || len(r.FormValue("id_employee")) == 0 {
-    response := commonResponse{
-      Status: http.StatusBadRequest,
-      Data: nil,
-    }
-    
-    common.SendJSON(w, r, response)
+    common.SendJSONError(w, r, "Bad Request", http.StatusBadRequest)
     return
   }
 
@@ -44,12 +40,8 @@ func HandleOrder(w http.ResponseWriter, r *http.Request) {
   orderId, err := insertOrder(ord)
 
   if err != nil {
-    response := commonResponse{
-      Status: http.StatusInternalServerError,
-      Data: nil,
-    }
-    common.SendJSON(w, r, response)
     log.Println(err)
+    common.SendJSONError(w, r, err.Error(), http.StatusInternalServerError)
     return
   }
 
@@ -66,12 +58,8 @@ func HandleOrder(w http.ResponseWriter, r *http.Request) {
 
   err = insertOrderDetails(ordDetails)
   if err != nil {
-    response := commonResponse{
-      Status: http.StatusInternalServerError,
-      Data: nil,
-    }
-    common.SendJSON(w, r, response)
     log.Println(err)
+    common.SendJSONError(w, r, err.Error(), http.StatusInternalServerError)
 
     return
   }
@@ -81,5 +69,12 @@ func HandleOrder(w http.ResponseWriter, r *http.Request) {
     Data: orderId,
   }
 
-  common.SendJSON(w, r, response)
+  res, err := json.Marshal(response)
+  if err != nil {
+    log.Println(err)
+    common.SendJSONError(w, r, err.Error(), http.StatusInternalServerError)
+    return
+  }
+
+  common.SendJSON(w, r, res, http.StatusOK)
 }

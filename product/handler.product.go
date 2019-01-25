@@ -1,6 +1,7 @@
 package product
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 
@@ -11,7 +12,13 @@ func GetProducts(w http.ResponseWriter, r *http.Request) {
 	var product Product
 	var arrProducts []Product
 
-	db := common.Connect()
+	db, err := common.Connect()
+	if err != nil {
+		log.Println(err)
+
+		common.SendJSONError(w, r, err.Error(), http.StatusInternalServerError)
+		return
+	}
 	defer db.Close()
 
 	rows, err := db.Query("SELECT * FROM product")
@@ -33,5 +40,11 @@ func GetProducts(w http.ResponseWriter, r *http.Request) {
 		Data:   arrProducts,
 	}
 
-	common.SendJSON(w, r, response)
+	res, err := json.Marshal(response)
+	if err != nil {
+		log.Println(err)
+		common.SendJSONError(w, r, err.Error(), http.StatusInternalServerError)
+	}
+
+	common.SendJSON(w, r, res, http.StatusOK)
 }

@@ -1,7 +1,8 @@
 package common
 
 import (
-  "database/sql"
+  _ "github.com/go-sql-driver/mysql"
+  "github.com/jmoiron/sqlx"
   "log"
   "fmt"
 )
@@ -12,19 +13,19 @@ const (
   dbname = "stall_pos"
 )
 
-func Connect() *sql.DB {
+func Connect() (*sqlx.DB, error) {
   var conn string
-  if len(conn) > 0 {
+  if len(pass) > 0 {
     conn = fmt.Sprintf("%s:%s@tcp(localhost:3306)/%s", user, pass, dbname)
   } else {
     conn = fmt.Sprintf("%s@tcp(localhost:3306)/%s", user, dbname)
   }
 
-  db, err := sql.Open("mysql", conn)
-
+  db, err := sqlx.Open("mysql", conn)
 	if err != nil {
-		log.Fatal(err)
+    log.Fatal(err)
+    return db, err
 	}
 
-	return db
+	return db, nil
 }

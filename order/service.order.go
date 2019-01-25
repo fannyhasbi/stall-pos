@@ -6,7 +6,11 @@ import (
 )
 
 func insertOrder(ord orderInsert) (int, error) {
-  db := common.Connect()
+  db, err := common.Connect()
+  if err != nil {
+    return 0, err
+  }
+
   defer db.Close()
 
   var query string
@@ -17,7 +21,7 @@ func insertOrder(ord orderInsert) (int, error) {
     query = fmt.Sprintf("INSERT INTO orders (emp_id) VALUES (%d)", ord.EmployeeID)
   }
 
-  _, err := db.Exec(query)
+  _, err = db.Exec(query)
   if err != nil {
     return 0, err
   }
@@ -35,12 +39,15 @@ func insertOrder(ord orderInsert) (int, error) {
 }
 
 func insertOrderDetails(ord orderDetailsInsert) error {
-  db := common.Connect()
+  db, err := common.Connect()
+  if err != nil {
+    return err
+  }
   defer db.Close()
 
   query := fmt.Sprintf("INSERT INTO order_details (product_id, order_id) VALUES (%d, %d)", ord.ProductID, ord.OrderID)
 
-  _, err := db.Exec(query)
+  _, err = db.Exec(query)
   if err != nil {
     return err
   }
